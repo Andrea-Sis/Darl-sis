@@ -16,7 +16,7 @@ const handler = async (m, {isOwner, isAdmin, conn, text, participants, args, com
   }
   teks += `└───────⭓
 
-𝘚𝘶𝘱𝘦𝘳 𝘉𝘰𝘵 𝘥𝘦 𝘞𝘩𝘢𝘵𝘴𝘈𝘱𝘱.\n_Contact: .owner`;
+𝘚𝘶𝘱𝘦𝘳 𝘉𝘰𝘵 𝘥𝘦 𝘞𝘩𝘢𝘵𝘴𝘈𝘱𝘱.\n_Contact:_ .owner`;
   conn.sendMessage(m.chat, {text: teks, mentions: participants.map((a) => a.id)} );
 };
 handler.help = ['todos'];
