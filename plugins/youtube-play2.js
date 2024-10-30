@@ -1,27 +1,61 @@
-import Scraper from '@SumiFX/Scraper'
+import yts from 'yt-search' 
+const handler = async (m, { conn, text, usedPrefix, command }) => {
+    if (!text) throw `Ejemplo: ${usedPrefix + command} diles`,m ,rcanal;
 
-let handler = async (m, { conn, text, args, usedPrefix, command }) => {
-if (!text) return conn.reply(m.chat, '🕐 Ingresa el título de un video o canción de YouTube.\n\n`Ejemplo:`\n' + `> *${usedPrefix + command}* Gemini Aaliyah - If Only`, m)
+    const randomReduction = Math.floor(Math.random() * 5) + 1;
+    let search = await yts(text);
+    let f = `\n\n${String.fromCharCode(68,101,118,101,108,111,112,101,100,32,98,121,32,73,39,109,32,70,122,32,126)}`;
+    let isVideo = /vid$/.test(command);
+    let urls = search.all[0].url;
+    let body = `\`YouTube Play\`
 
-let user = global.db.data.users[m.sender]
-try {
-let res = await Scraper.ytsearch(text)
-let { title, size, quality, thumbnail, dl_url } = await Scraper.ytmp4(res[0].url)
-if (size.includes('GB') || size.replace(' MB', '') > 300) { return await m.reply('El archivo pesa mas de 300 MB, se canceló la Descarga.')}
-let txt = `╭─⬣「 *YouTube Play* 」⬣\n`
-    txt += `│  ≡◦ *⭐ Titulo ∙* ${title}\n`
-    txt += `│  ≡◦ *📅 Publicado ∙* ${res[0].published}\n`
-    txt += `│  ≡◦ *🕜 Duración ∙* ${res[0].duration}\n`
-    txt += `│  ≡◦ *👤 Autor ∙* ${res[0].author}\n`
-    txt += `│  ≡◦ *⛓ Url ∙* ${res[0].url}\n`
-    txt += `│  ≡◦ *🪴 Calidad ∙* ${quality}\n`
-    txt += `│  ≡◦ *⚖ Peso ∙* ${size}\n`
-    txt += `╰─⬣`
-await conn.sendFile(m.chat, thumbnail, 'thumbnail.jpg', txt, m)
-await conn.sendFile(m.chat, dl_url, title + '.mp4', `*🍭 Titulo ∙* ${title}\n*🪴 Calidad ∙* ${quality}`, m, false, { asDocument: user.useDocument })
-} catch {
-}}
-handler.help = ["play2 <búsqueda>"]
-handler.tags = ["downloader"]
-handler.command = ["play2"]
-export default handler
+    *Título:* ${search.all[0].title}
+    *Vistas:* ${search.all[0].views}
+    *Duración:* ${search.all[0].timestamp}
+    *Subido:* ${search.all[0].ago}
+    *Url:* ${urls}
+
+🕒 *Su ${isVideo ? 'Video' : 'Audio'} se está enviando, espere un momento...*`;
+    
+    conn.sendMessage(m.chat, { 
+        image: { url: search.all[0].thumbnail }, 
+        caption: body + f
+    }, { quoted: m,rcanal });
+    m.react('react1')
+
+    let res = await dl_vid(urls)
+    let type = isVideo ? 'video' : 'audio';
+    let video = res.data.mp4;
+    let audio = res.data.mp3;
+    conn.sendMessage(m.chat, { 
+        [type]: { url: isVideo ? video : audio }, 
+        gifPlayback: false, 
+        mimetype: isVideo ? "video/mp4" : "audio/mpeg" 
+    }, { quoted: m });
+}
+
+handler.command = ['play < Busquedad >', 'play2 < Busquedad >'];
+handler.help = ['play', 'play2'];
+handler.tags = ['dl'];
+export default handler;
+
+async function dl_vid(url) {
+    const response = await fetch('https://shinoa.us.kg/api/download/ytdl', {
+        method: 'POST',
+        headers: {
+            'accept': '*/*',
+            'api_key': 'free',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            text: url,
+        })
+    });
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data;
+        }
