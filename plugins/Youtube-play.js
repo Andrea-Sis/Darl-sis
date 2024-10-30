@@ -34,7 +34,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
     }, { quoted: m });
 }
 
-handler.command = ['play', 'play2'];
+handler.command = ['play', 'playvid'];
 handler.help = ['play <Busqueda>', 'play2 <Busquedad>'];
 handler.tags = ['dl'];
 export default handler;
